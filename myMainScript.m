@@ -5,7 +5,7 @@ input_image = imread('./img/image-quilting/input_1.bmp');
 input_image_dim = size(size(input_image),2);
 patch_size = 48;
 overlap = 8;
-tolerance = 2;
+tolerance = 1;
 
 output = overlapping_blocks(im2double(input_image), [3,3],patch_size,overlap,tolerance);
 
