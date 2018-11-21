@@ -38,8 +38,11 @@ function [output_image] = overlapping_blocks(input_texture, output_image_size,pa
                 if(col > 1)
                     left_block = output_image(1:patch_size,1+(patch_size-overlap)*(col-2):(patch_size-overlap)*(col-2)+patch_size,:); 
                     left_block = reshape(left_block,patch_size*patch_size,1,input_texture_dim);
-                    error = patches - repmat(left_block,1,num_patches);
-                    error = sum(sum(error.^2,1),3);
+                    %error = patches - repmat(left_block,1,num_patches);
+                    %error = sum(sum(error.^2,1),3);
+                    overlap_error = patches(size(patches,1)-overlap*patch_size+1:size(patches,1),:,:)-repmat(left_block(size(patches,1)-overlap*patch_size+1:size(patches,1),:,:),1,num_patches);
+                    overlap_error = sum(sum(overlap_error.^2,1),3);
+                    error = overlap_error;
                     left_block = reshape(left_block,patch_size,patch_size,input_texture_dim);
                     
                 end
@@ -49,6 +52,14 @@ function [output_image] = overlapping_blocks(input_texture, output_image_size,pa
                     top_block = reshape(top_block,patch_size*patch_size,1,input_texture_dim);
                     error = patches - repmat(top_block,1,num_patches);
                     error = sum(sum(error.^2,1),3);
+                    
+                    index = 1:patch_size*patch_size;
+                    mask = (patch_size-overlap <= mod(index-1,patch_size)<patch_size);
+                    
+                    %display(size(repmat(mask',1,num_patches,input_texture_dim)));
+                    overlap_error = patches.*repmat(mask',1,num_patches,input_texture_dim) - repmat(top_block.*repmat(mask',1,1,input_texture_dim),1,num_patches);
+                    overlap_error = sum(sum(overlap_error.^2,1),3);
+                    error = overlap_error;
                     top_block = reshape(top_block,patch_size,patch_size,input_texture_dim);
 
                 end
@@ -61,7 +72,13 @@ function [output_image] = overlapping_blocks(input_texture, output_image_size,pa
                 error1 = sum(sum(error1.^2,1),3);
                 error2 = patches - repmat(left_block,1,num_patches);
                 error2 = sum(sum(error2.^2,1),3);
-                error = error1+error2;
+                
+                overlap_error1 = patches(size(patches,1)-overlap*patch_size+1:size(patches,1),:,:)-repmat(left_block(size(patches,1)-overlap*patch_size+1:size(patches,1),:,:),1,num_patches);
+                overlap_error1 = sum(sum(overlap_error1.^2,1),3);
+                overlap_error2 = patches.*repmat(mask',1,num_patches,input_texture_dim) - repmat(top_block.*repmat(mask',1,1,input_texture_dim),1,num_patches);
+                overlap_error2 = sum(sum(overlap_error2.^2,1),3);
+                %error = error1+error2;
+                error = overlap_error1 + overlap_error2;
                 top_block = reshape(top_block,patch_size,patch_size,input_texture_dim);
                 left_block = reshape(left_block,patch_size,patch_size,input_texture_dim);
 
@@ -77,7 +94,7 @@ function [output_image] = overlapping_blocks(input_texture, output_image_size,pa
                 possible_blocks = (error < (1+tolerance)*min_error & error > 0).*index;
                 possible_blocks(possible_blocks==0)=[];
                 next_block_no = randi([1,size(possible_blocks,2)],1,1);
-                fprintf('Row = %d, Col = %d, Patch No. = %d, No. of possible blocks = %d\n',row,col,possible_blocks(next_block_no(1)),size(possible_blocks,2));
+                fprintf('Row = %d, Col = %d, Patch No. = %d, Min Error = %d, No. of possible blocks = %d\n',row,col,possible_blocks(next_block_no(1)),min_error,size(possible_blocks,2));
                 next_patch = patches(:,possible_blocks(next_block_no(1)),:);
                 next_patch = reshape(next_patch,patch_size,patch_size,input_texture_dim);
                 
