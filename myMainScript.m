@@ -1,10 +1,11 @@
 clc;
 clear;
 tic;
-input_image = imread('./images/Brick.0001.png');
+input_image = imread('./images/fruits1.bmp');
+input_image(input_image==0) = 1;
 input_image_dim = size(size(input_image),2);
-patch_size = 48;
-overlap = 8;
+patch_size = 36;
+overlap = 6;
 tolerance = 0.25;
 
 
@@ -26,7 +27,7 @@ title('Input Texture');
 % imshow(output);
 % title('Synthesized Texture Without Cut');
 
-output_cut = overlapping_blocks(im2double(input_image), [6,6],patch_size,overlap,tolerance,true);
+output_cut = overlapping_blocks(im2double(input_image), [8,8],patch_size,overlap,tolerance,true);
 figure(4);
 imshow(output_cut);
 title('Synthesized Texture with Cut');
