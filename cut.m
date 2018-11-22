@@ -89,9 +89,9 @@ function [output,line] = cut(block,left_block,top_block,overlap,type)
                 if(j>=vert_line(i) && i >= horz_line(j))
                     output(i,j,:)=block(i,j,:);
                 elseif(j>=vert_line(i))
-                    output(i,j,:)=top_block(patch_size-overlap+i,j,:);
+                    output(i,j,:)=0.5*(top_block(patch_size-overlap+i,j,:)+block(i,j,:));
                 elseif(i>=horz_line(j))
-                    output(i,j,:)=left_block(i,patch_size-overlap+j,:); 
+                    output(i,j,:)=0.5*(left_block(i,patch_size-overlap+j,:)+block(i,j,:)); 
                 else
                     output(i,j,:)=0.5*(top_block(patch_size-overlap+i,j,:)+left_block(i,patch_size-overlap+j,:));
                 end
