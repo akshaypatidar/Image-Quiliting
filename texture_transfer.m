@@ -1,4 +1,4 @@
-function [output_image] = texture_transfer(input_texture, target_image, c_map,patch_size,overlap,tolerance,alph, map_used)
+function [output_image] = texture_transfer(input_texture, target_image,patch_size,overlap,tolerance,alph)
 %UNTITLED Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -9,10 +9,6 @@ function [output_image] = texture_transfer(input_texture, target_image, c_map,pa
     [sz1,sz2,sz3] = size(target_image);
     if(input_texture_dim == 2)
         patches_original = get_patches(input_texture,patch_size);
-%         if(map_used == 1)
-%             map_patches = get_patches(c_map,patch_size);
-%             map_patches = double(map_patches);
-%         end
         patches_original = double(patches_original);
         output_image = zeros(fix((sz1-overlap)/(patch_size-overlap)),fix((sz2-overlap)/(patch_size-overlap)));
 
@@ -21,20 +17,10 @@ function [output_image] = texture_transfer(input_texture, target_image, c_map,pa
         patches_original(:,:,2) = get_patches(input_texture(:,:,2),patch_size);
         patches_original(:,:,3) = get_patches(input_texture(:,:,3),patch_size);
         patches_original = double(patches_original);
-%         if(map_used == 1)
-%             map_patches(:,:,1) = get_patches(c_map(:,:,1),patch_size);
-%             map_patches(:,:,2) = get_patches(c_map(:,:,2),patch_size);
-%             map_patches(:,:,3) = get_patches(c_map(:,:,3),patch_size);
-%             map_patches = double(map_patches);
-%         end
         output_image = zeros(fix((sz1-overlap)/(patch_size-overlap)),fix((sz2-overlap)/(patch_size-overlap)),sz3);
     end
     
-%     if(map_used == 1)
-%         patches = map_patches;
-%     else 
-        patches = patches_orignal;
-%     end
+    patches = patches_original;
     
     num_patches = size(patches,2);
     
